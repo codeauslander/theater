@@ -8,19 +8,23 @@ There are many ways to code this challenge, so we'd like to see your thought pro
 Please submit your challenge application within 7 days (feel free to use generators and gems to help you build quickly). You can submit the challenge by pushing your code to GitHub and deploying the app to Heroku and emailing me your GitHub and Heroku links.
 
 Ticket
+  belongs_to :movie
+  belongs_to :order
+
   movie_id
   order_id
   price
 
 User
   has_many: orders
+  
   name
   email
 
 Order
   belongs_to :user
   has_many :tickets
-  
+
   user_id
   credit_card
   expiration_date
