@@ -3,8 +3,9 @@ class TicketsController < ApplicationController
 
   # GET /tickets
   def index
-    @tickets = Ticket.all
-
+    puts params
+    @tickets = Ticket.where(order_id: params[:order_id])
+    puts @tickets
     render json: @tickets
   end
 

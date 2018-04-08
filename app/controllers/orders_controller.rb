@@ -15,9 +15,26 @@ class OrdersController < ApplicationController
 
   # POST /orders
   def create
-    @order = Order.new(order_params)
+    @order = Order.new(
+        user_id: params[:user_id],
+        credit_card: params[:credit_card],
+        expiration_date: params[:expiration_date]
+      )
 
     if @order.save
+      total = 0
+      params[:tickets].each do |ticket|
+        puts ticket
+        Ticket.create!(
+          {
+            movie_id: ticket[:movie_id],
+            order_id: @order.id
+          })
+        total += ticket[:movie_price]
+      end
+
+      @order.update(total: total)
+
       render json: @order, status: :created, location: @order
     else
       render json: @order.errors, status: :unprocessable_entity

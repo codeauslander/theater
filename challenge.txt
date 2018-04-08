@@ -9,15 +9,15 @@ Please submit your challenge application within 7 days (feel free to use generat
 
 Ticket
   belongs_to :movie
-  belongs_to :order
+  belongs_to :order optional: true
 
   movie_id
   order_id
-  price
+  
 
 User
   has_many: orders
-  
+
   name
   email
 
@@ -28,6 +28,7 @@ Order
   user_id
   credit_card
   expiration_date
+  total
 
 Cinema
   has_many: movies
@@ -41,6 +42,7 @@ Movie
   showtime
   duration
   seats
+  price
 
 
 
