@@ -1,10 +1,11 @@
 class OrdersController < ApplicationController
+  before_action :authenticate_user, only: [:index]
   before_action :set_order, only: [:show, :update, :destroy]
+
 
   # GET /orders
   def index
-    @orders = Order.all
-
+    @orders = current_user.orders
     render json: @orders
   end
 
@@ -16,7 +17,7 @@ class OrdersController < ApplicationController
   # POST /orders
   def create
     @order = Order.new(
-        user_id: params[:user_id],
+        user_id: current_user.id,
         credit_card: params[:credit_card],
         expiration_date: params[:expiration_date]
       )

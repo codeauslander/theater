@@ -7,7 +7,7 @@ var MoviePage = {
       message: "Boom",
       movies: [],
       tickets: [],
-      userId: 1,
+      // userId: 1,
       creditCard: "1234",
       expirationDate: "2018-11-19T14:37:48.000Z",
       total: 0,
@@ -32,7 +32,7 @@ var MoviePage = {
     orderTickets: function() {
       var params = {
         tickets: this.tickets,
-        user_id: this.userId,
+        // user_id: this.userId,
         credit_card: this.creditCard,
         expiration_date: this.expirationDate
       };
@@ -51,20 +51,112 @@ var MoviePage = {
         }.bind(this)
       );
     }
-  }
+  },
+  updated: function() {},
+  computed: {},
+  props: {}
+};
 
-  // updated: function() {},
-  // computed: {},
-  // props: {}
+var OrderPage = {
+  template: "#orders-page",
+  data: function() {
+    return {
+      orders: []
+    };
+  },
+  created: function() {
+    axios.get("/orders").then(
+      function(response) {
+        this.orders = response.data;
+        console.log(response.data);
+      }.bind(this)
+    );
+  }
+};
+
+// Authorization Components
+var SignupPage = {
+  template: "#signup-page",
+  data: function() {
+    return {
+      name: "",
+      email: "",
+      password: "",
+      passwordConfirmation: "",
+      errors: []
+    };
+  },
+  methods: {
+    submit: function() {
+      var params = {
+        name: this.name,
+        email: this.email,
+        password: this.password,
+        password_confirmation: this.passwordConfirmation
+      };
+      axios
+        .post("/users", params)
+        .then(function(response) {
+          router.push("/login");
+        })
+        .catch(
+          function(error) {
+            this.errors = error.response.data.errors;
+          }.bind(this)
+        );
+    }
+  }
+};
+
+var LoginPage = {
+  template: "#login-page",
+  data: function() {
+    return {
+      email: "",
+      password: "",
+      errors: []
+    };
+  },
+  methods: {
+    submit: function() {
+      var params = {
+        auth: { email: this.email, password: this.password }
+      };
+      axios
+        .post("/user_token", params)
+        .then(function(response) {
+          axios.defaults.headers.common["Authorization"] =
+            "Bearer " + response.data.jwt;
+          localStorage.setItem("jwt", response.data.jwt);
+          router.push("/");
+        })
+        .catch(
+          function(error) {
+            this.errors = ["Invalid email or password."];
+            this.email = "";
+            this.password = "";
+          }.bind(this)
+        );
+    }
+  }
+};
+
+var LogoutPage = {
+  template: "#home-page",
+  created: function() {
+    axios.defaults.headers.common["Authorization"] = undefined;
+    localStorage.removeItem("jwt");
+    router.push("/");
+  }
 };
 
 var router = new VueRouter({
   routes: [
-    { path: "/", component: MoviePage }
-
-    // { path: "/signup", component: SignupPage },
-    // { path: "/login", component: LoginPage },
-    // { path: "/logout", component: LogoutPage }
+    { path: "/", component: MoviePage },
+    { path: "/orders", component: OrderPage },
+    { path: "/signup", component: SignupPage },
+    { path: "/login", component: LoginPage },
+    { path: "/logout", component: LogoutPage }
   ],
   scrollBehavior: function(to, from, savedPosition) {
     return { x: 0, y: 0 };
@@ -75,86 +167,10 @@ var app = new Vue({
   el: "#vue-app",
   router: router,
   created: function() {
-    // var jwt = localStorage.getItem("jwt");
-    // console.log(jwt);
-    // if (jwt) {
-    //   axios.defaults.headers.common["Authorization"] = jwt;
-    // }
+    var jwt = localStorage.getItem("jwt");
+    console.log(jwt);
+    if (jwt) {
+      axios.defaults.headers.common["Authorization"] = jwt;
+    }
   }
 });
-
-// Authorization Components
-// var SignupPage = {
-//   template: "#signup-page",
-//   data: function() {
-//     return {
-//       name: "",
-//       email: "",
-//       password: "",
-//       passwordConfirmation: "",
-//       errors: []
-//     };
-//   },
-//   methods: {
-//     submit: function() {
-//       var params = {
-//         name: this.name,
-//         email: this.email,
-//         password: this.password,
-//         password_confirmation: this.passwordConfirmation
-//       };
-//       axios
-//         .post("/users", params)
-//         .then(function(response) {
-//           router.push("/login");
-//         })
-//         .catch(
-//           function(error) {
-//             this.errors = error.response.data.errors;
-//           }.bind(this)
-//         );
-//     }
-//   }
-// };
-
-// var LoginPage = {
-//   template: "#login-page",
-//   data: function() {
-//     return {
-//       email: "",
-//       password: "",
-//       errors: []
-//     };
-//   },
-//   methods: {
-//     submit: function() {
-//       var params = {
-//         auth: { email: this.email, password: this.password }
-//       };
-//       axios
-//         .post("/user_token", params)
-//         .then(function(response) {
-//           axios.defaults.headers.common["Authorization"] =
-//             "Bearer " + response.data.jwt;
-//           localStorage.setItem("jwt", response.data.jwt);
-//           router.push("/");
-//         })
-//         .catch(
-//           function(error) {
-//             this.errors = ["Invalid email or password."];
-//             this.email = "";
-//             this.password = "";
-//           }.bind(this)
-//         );
-//     }
-//   }
-// };
-
-// var LogoutPage = {
-//   template: "#home-page",
-//   created: function() {
-//     axios.defaults.headers.common["Authorization"] = undefined;
-//     localStorage.removeItem("jwt");
-//     router.push("/");
-//   }
-// };
